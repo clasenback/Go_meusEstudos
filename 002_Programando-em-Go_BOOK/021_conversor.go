@@ -6,6 +6,25 @@ import (
 	"strconv"
 )
 
+func main() {
+	if len(os.Args) < 3 {
+		fmt.Println("Uso: conversor <valores> <unidade>")
+		fmt.Println("As opções válidas para unidades são:")
+		fmt.Println("C \t Celsius")
+		fmt.Println("F \t Fahrenheit")
+		fmt.Println("km \t quilômetros")
+		fmt.Println("mi \t milhas")
+		os.Exit(1)
+	}
+
+	unidadeOrigem := os.Args[len(os.Args)-1]
+	valoresOrigem := os.Args[1 : len(os.Args)-1]
+
+	for _, valorOrigem := range valoresOrigem {
+		converter(valorOrigem, unidadeOrigem)
+	}
+}
+
 func converter(valorOrigem string, unidadeOrigem string) {
 	v, err := strconv.ParseFloat(valorOrigem, 64)
 	if err != nil {
@@ -33,24 +52,5 @@ func converter(valorOrigem string, unidadeOrigem string) {
 	default:
 		fmt.Printf("%v não é uma unidade conhecida!", unidadeOrigem)
 		os.Exit(1)
-	}
-}
-
-func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Uso: conversor <valores> <unidade>")
-		fmt.Println("As opções válidas para unidades são:")
-		fmt.Println("C \t Celsius")
-		fmt.Println("F \t Fahrenheit")
-		fmt.Println("km \t quilômetros")
-		fmt.Println("mi \t milhas")
-		os.Exit(1)
-	}
-
-	unidadeOrigem := os.Args[len(os.Args)-1]
-	valoresOrigem := os.Args[1 : len(os.Args)-1]
-
-	for _, valorOrigem := range valoresOrigem {
-		converter(valorOrigem, unidadeOrigem)
 	}
 }

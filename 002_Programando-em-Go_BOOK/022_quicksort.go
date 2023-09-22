@@ -7,6 +7,10 @@ import (
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Nenhum argumento informado.")
+		os.Exit(1)
+	}
 	entrada := os.Args[1:]
 	numeros := make([]int, len(entrada))
 	for i, n := range entrada {
