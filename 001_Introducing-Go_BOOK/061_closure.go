@@ -56,8 +56,8 @@ func makePrimeGenerator() func() (uint, []uint) {
 }
 
 func addAllBelow(n uint, xi []uint) uint {
-/* 	adiciona os elementos de um slice de valores 
-	ordenados até o elemento com valor n */
+	/* 	adiciona os elementos de um slice de valores
+	   	ordenados até o elemento com valor n */
 	var total uint
 	for _, v := range xi {
 		if v < n {
@@ -69,15 +69,16 @@ func addAllBelow(n uint, xi []uint) uint {
 	return total
 }
 
-func addAll(xi []int) total int{
-/* 	sum is a function that takes a slice of numbers 
-	and adds them together. What would its function 
-	signature look like in Go?
-*/
-	for _, v:range xi{
+func addAll(xi []int) int {
+	/* 	sum is a function that takes a slice of numbers
+	   	and adds them together. What would its function
+	   	signature look like in Go?
+	*/
+	var total int
+	for _, v := range xi {
 		total += v
 	}
-	return
+	return total
 }
 
 func main() {
