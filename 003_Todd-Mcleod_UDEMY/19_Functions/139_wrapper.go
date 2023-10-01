@@ -9,14 +9,15 @@ func main() {
 	Cronometrar(Dormir)
 }
 
-func Cronometrar(fn func()) {
+func Cronometrar(fn func() int) {
 	// wrapper function
 	t := time.Now()
-	fn()
-	fmt.Println("A função foi executada em", time.Since(t))
+	res := fn()
+	fmt.Printf("A função foi executada em %v \t %v \n", time.Since(t), res)
 }
 
-func Dormir() {
+func Dormir() int {
 	time.Sleep(2 * time.Second)
 	fmt.Println("Função DORMIR executada.")
+	return 1
 }
