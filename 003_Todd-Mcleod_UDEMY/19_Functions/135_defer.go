@@ -1,4 +1,8 @@
-/* Este exercício verifica em que momento a função vinculada a defer é executada, se no momento em que é chamada pelo defer ou ao final do bloco em que o defer está inserido. O resultado indica que o defer é executado no momento em que é chamado e o seu valor guardado para ser apresentado ao final da execução do bloco. */
+/*
+Este exercício verifica em que momento a função vinculada a defer é executada, se no momento em que é chamada pelo defer ou ao final do bloco em que o defer está inserido. O resultado indica que o defer é executado no momento em que é chamado e o seu valor guardado para ser apresentado ao final da execução do bloco.
+
+A função makePrimeGenerator é utilizada apenas como forma de retardar a execução do código.
+*/
 
 package main
 

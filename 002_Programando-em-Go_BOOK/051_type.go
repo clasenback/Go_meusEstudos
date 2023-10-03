@@ -19,6 +19,7 @@ func main() {
 	fmt.Println("Carnes:", carnes)
 	fmt.Println("Outros:", outros)
 
+	// Conversão de tipos
 	extras := []string{"detergente", "vinho"}
 	lista = append(lista, listaCompras(extras)...)
 	_, _, outros = lista.Categorizar()
