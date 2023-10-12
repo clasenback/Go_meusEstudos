@@ -33,7 +33,7 @@ type meuTipo2 interface {
 	~float32 | ~int
 }
 
-//add3 recebe a e b de quaisquer tipos rastreáveis como float32 ou int e retorna a soma com o mesmo tipo que recebeu
+//add3 recebe a e b de quailquer tipo rastreável como float32 ou int e retorna a soma com o mesmo tipo que recebeu. Ambos parametros precisam ser do mesmo tipo. 
 func add3[T meuTipo2](a, b T) T {
 	return a + b
 }
