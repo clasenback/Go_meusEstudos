@@ -7,10 +7,12 @@ import (
 
 func main() {
 	meuCaixa := iniciarCaixaAleatorio(100)
+	caixaInicial := meuCaixa
 	fmt.Printf("Total em caixa: $%v\n", somaNotas(meuCaixa))
 
 	var meuSaque saque
 	var saquesOK, saquesParciais, caixaInsuficiente, caixaInsufSeguidos int
+	var extratos []extrato
 
 	for {
 		queroSacar := valor(rand.Intn(1000))
@@ -35,12 +37,15 @@ func main() {
 		case queroSacar == somaNotas(meuSaque):
 			saquesOK++
 			caixaInsufSeguidos = 0
+			extratos = append(extratos, extrato{requisitado: queroSacar, sacado: meuSaque, flag: 1, emCaixa: somaNotas(meuCaixa)})
 		case queroSacar < somaNotas(meuCaixa):
 			saquesParciais++
 			caixaInsufSeguidos = 0
+			extratos = append(extratos, extrato{requisitado: queroSacar, sacado: meuSaque, flag: 0, emCaixa: somaNotas(meuCaixa)})
 		case queroSacar > somaNotas(meuCaixa):
 			caixaInsuficiente++
 			caixaInsufSeguidos++
+			extratos = append(extratos, extrato{requisitado: queroSacar, sacado: meuSaque, flag: -1, emCaixa: somaNotas(meuCaixa)})
 		default:
 			fmt.Println("algum erro")
 		}
@@ -59,6 +64,16 @@ func main() {
 
 	fmt.Println("")
 	fmt.Println("==== CAIXA DESLIGADO ====")
+
+	fmt.Println("")
+	fmt.Println("==== RESUMO DA OPERAÇÃO ====")
+	fmt.Println("==== Caixa Inicial ====")
+	contarNotas(caixaInicial)
+	fmt.Printf("Total inicial em caixa: $%v\n", somaNotas(caixaInicial))
+	fmt.Println("==== Operações realizadas ====")
+	for i := range extratos {
+		fmt.Println(i, extratos[i])
+	}
 }
 
 type valor int
@@ -163,6 +178,13 @@ func requisitarNotas(v valor, c caixa) (saque, caixa) {
 	}
 
 	return s, cRestante
+}
+
+type extrato struct {
+	flag        int
+	requisitado valor
+	emCaixa     valor
+	sacado      saque
 }
 
 /*
