@@ -15,7 +15,7 @@ func main() {
 	var extratos []extrato
 
 	for {
-		queroSacar := valor(rand.Intn(1000))
+		queroSacar := valor(rand.Intn(300))
 		fmt.Println("")
 		fmt.Printf("VALOR DO SAQUE: $%v\n", queroSacar)
 
