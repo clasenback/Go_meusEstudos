@@ -21,8 +21,8 @@ func main() {
 	for i := 0; i < gs; i++ {
 		go func() {
 			v := counter
-			t := rand.Intn(100)
-			time.Sleep(time.Duration(t) * time.Millisecond)
+			t := time.Duration(rand.Intn(100))
+			time.Sleep(t * time.Millisecond)
 			//runtime.Gosched()
 			v++
 			fmt.Println("i:", i, "\tcount:", v, "\tativas:", runtime.NumGoroutine(), "\trand:", t)
