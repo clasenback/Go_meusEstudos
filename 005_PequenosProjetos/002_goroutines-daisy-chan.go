@@ -2,33 +2,46 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
+func whisper(l, r chan int) {
+	l <- 1 + <-r
+}
+
 func main() {
+	fmt.Println("caso não rode, 'go build'")
+
 	t := time.Now()
-	const n = 5
-	var wg sync.WaitGroup
+
+	const n int = 1000000
+
 	leftmost := make(chan int)
 	right := leftmost
 	left := leftmost
-	wg.Add(n)
-	for i := 0; i < n; i++ {
+
+	for i := 1; i <= n; i++ {
 		right = make(chan int)
-		go func(l, r chan int) {
-			left <- 1 + <-right
-			fmt.Println()
-			wg.Done()
-		}(left, right)
+		//fmt.Println("Lançando whisper", i)
+		go whisper(left, right)
 		left = right
 	}
-	go func(c chan int) { c <- 1 }(right)
-	final := <-leftmost
-	fmt.Println(final)
-	wg.Wait()
+
+	go func(c chan int) { c <- 0 }(right)
+	//fmt.Println(<-right)
+	fmt.Println(<-leftmost)
+	fmt.Println(time.Since(t))
+
+	t = time.Now()
+	var soma int
+	for i := 1; i <= n; i++ {
+		soma++
+	}
+	fmt.Println(soma)
 	fmt.Println(time.Since(t))
 }
+
+// 'go build' antes de rodar
 
 /*
 GOOGLE I/O 2012 - GO CONCURRENCY PATTERNS by Rob Pyke

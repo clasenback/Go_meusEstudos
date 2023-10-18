@@ -7,26 +7,33 @@ import (
 )
 
 func main() {
-	c := fanIn(boring("Joe"), boring("Ann"))
-	timeout := time.After(time.Time(10e6) * time.Millisecond)
-	for i := 0; i < 10; i++ {
+
+	c := fanIn(cronometro("Relógio 1", 3e3), cronometro("Relógio 2", 1e3))
+
+	t := 1 * time.Second
+	timeout := time.Tick(t)
+	//var norma, alex int = 1
+
+	tLoop := time.Now()
+	for i := 1; i <= 10; i++ {
 		select {
 		case v := <-c:
-			fmt.Println(v)
-		case v := timeout:
-			fmt.Println("Acabou o tempo após", v)
+			fmt.Printf("%v\t%v\t%v\n", i, time.Since(tLoop), v)
+		case <-timeout:
+			fmt.Printf("%v\t%v\ttimeout contou %v\n", i, time.Since(tLoop), t)
 		}
-
 	}
-	fmt.Println("You're both boring; I'm leaving.")
+	fmt.Printf("Foram tomados 10 tempos aleatórios. Programa encerrado após %v.\n", time.Since(tLoop))
 }
 
-func boring(msg string) <-chan string {
+func cronometro(msg string, r int) <-chan string {
 	c := make(chan string)
 	go func() {
+		var t time.Duration
 		for i := 0; ; i++ {
-			c <- fmt.Sprintf("%s %d", msg, i)
-			time.Sleep(time.Duration(rand.Intn(2e3)) * time.Millisecond)
+			t = time.Duration(rand.Intn(r)) * time.Millisecond
+			time.Sleep(t)
+			c <- fmt.Sprintf("%s contou %v", msg, t)
 		}
 	}()
 	return c
@@ -49,6 +56,10 @@ func fanIn(input1, input2 <-chan string) <-chan string {
 }
 
 /*
+
+O programa roda três cronômetros aleatórios em concorrência e imprime as 10 primeiras contagens.
+O cronometro 'timeout' poderia estar dentro da função fanIn, mas foi deixada no select em func main por motivos pedagógicos.
+
 code source:
 Rob Pike
 https://talks.golang.org/2012/concurrency.slide#25
