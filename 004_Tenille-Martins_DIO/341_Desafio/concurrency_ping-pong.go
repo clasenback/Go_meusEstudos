@@ -24,8 +24,8 @@ func main() {
 
 	go func() {
 		go iniciaPP(comm2)
-		go pingpong(JOGADOR1, canal, comm2, comm1)
-		go pingpong(JOGADOR2, canal, comm1, comm2)
+		go jogadorPP(JOGADOR1, canal, comm2, comm1)
+		go jogadorPP(JOGADOR2, canal, comm1, comm2)
 	}()
 
 	go assisteJogo(canal)
@@ -36,7 +36,7 @@ func main() {
 
 func iniciaPP(bolaEnviada chan<- bool) { bolaEnviada <- true }
 
-func pingpong(jogador string, transmite chan<- jogada, bolaRecebida <-chan bool, bolaEnviada chan<- bool) {
+func jogadorPP(jogador string, transmite chan<- jogada, bolaRecebida <-chan bool, bolaEnviada chan<- bool) {
 	var turno int
 	var bola bool
 	var evento jogada
