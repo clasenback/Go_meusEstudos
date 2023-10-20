@@ -28,18 +28,7 @@ func main() {
 		go pingpong(JOGADOR2, canal, comm1, comm2)
 	}()
 
-	go func() {
-		for v := range canal {
-			if v.tempo > TMAX {
-				fmt.Printf("%v\t%v\t\tPERDEU na jogada %v: %v maior que %v\n", v.jogada, v.jogador, v.jogada, v.tempo, TMAX)
-				fmt.Println()
-				fmt.Println("⌨\nDigite ENTER para encerrar o programa...")
-				return
-			} else {
-				fmt.Printf("%v\t%v\t\t%v\n", v.jogada, v.jogador, v.tempo)
-			}
-		}
-	}()
+	go assisteJogo(canal)
 
 	var quit string
 	fmt.Scanln(&quit)
@@ -62,5 +51,18 @@ func pingpong(jogador string, transmite chan<- jogada, bolaRecebida <-chan bool,
 		evento.tempo = t
 		transmite <- evento
 		bolaEnviada <- bola
+	}
+}
+
+func assisteJogo(canal chan jogada) {
+	for v := range canal {
+		if v.tempo > TMAX {
+			fmt.Printf("%v\t%v\t\tPERDEU na jogada %v: %v maior que %v\n", v.jogada, v.jogador, v.jogada, v.tempo, TMAX)
+			fmt.Println()
+			fmt.Println("⌨\nDigite ENTER para encerrar o programa...")
+			return
+		} else {
+			fmt.Printf("%v\t%v\t\t%v\n", v.jogada, v.jogador, v.tempo)
+		}
 	}
 }
