@@ -6,50 +6,61 @@ import (
 	"time"
 )
 
-type pacote struct {
-	pp    string
-	n     int
-	tempo time.Duration
+const JOGADOR1 string = "🏓 ping"
+const JOGADOR2 string = "pong 🏓"
+const TJOGADA int = 2000
+const TMAX time.Duration = 1900 * time.Millisecond
+
+type jogada struct {
+	jogada  int
+	jogador string
+	tempo   time.Duration
 }
 
 func main() {
-	canal := make(chan pacote)
+	canal := make(chan jogada)
 	comm1 := make(chan bool)
 	comm2 := make(chan bool)
 
 	go func() {
-		go iniciaPP(comm1)
-		go pingpong("ping", canal, comm1, comm2)
-		go pingpong("pong", canal, comm2, comm1)
+		go iniciaPP(comm2)
+		go pingpong(JOGADOR1, canal, comm2, comm1)
+		go pingpong(JOGADOR2, canal, comm1, comm2)
 	}()
 
 	go func() {
 		for v := range canal {
-			fmt.Println(v.n, v.pp, v.tempo)
+			if v.tempo > TMAX {
+				fmt.Printf("%v\t%v\t\tPERDEU na jogada %v: %v maior que %v\n", v.jogada, v.jogador, v.jogada, v.tempo, TMAX)
+				fmt.Println()
+				fmt.Println("⌨\nDigite ENTER para encerrar o programa...")
+				return
+			} else {
+				fmt.Printf("%v\t%v\t\t%v\n", v.jogada, v.jogador, v.tempo)
+			}
 		}
 	}()
 
 	var quit string
 	fmt.Scanln(&quit)
-
 }
 
-func pingpong(s string, c chan<- pacote, p1 <-chan bool, p2 chan<- bool) {
-	var i int
-	var bastao bool
-	var pct pacote
+func iniciaPP(bolaEnviada chan<- bool) { bolaEnviada <- true }
+
+func pingpong(jogador string, transmite chan<- jogada, bolaRecebida <-chan bool, bolaEnviada chan<- bool) {
+	var turno int
+	var bola bool
+	var evento jogada
 	var t time.Duration
 	for {
-		t = time.Duration(rand.Intn(2000) * int(time.Millisecond))
+		turno++
+		t = time.Duration(rand.Intn(TJOGADA)) * time.Millisecond
 		time.Sleep(t)
-		i++
-		bastao = <-p1
-		pct.pp = s
-		pct.n = i
-		pct.tempo = t
-		c <- pct
-		p2 <- bastao
+		bola = <-bolaRecebida
+		evento.jogador = jogador
+		evento.jogada = turno
+		evento.tempo = t
+		transmite <- evento
+		bolaEnviada <- bola
 	}
 }
-
-func iniciaPP(p chan<- bool) { p <- true }
