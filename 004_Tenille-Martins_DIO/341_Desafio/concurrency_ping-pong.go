@@ -18,25 +18,26 @@ type jogada struct {
 }
 
 func main() {
-	canal := make(chan jogada)
-	comm1 := make(chan bool)
-	comm2 := make(chan bool)
+	player1, player2 := criaRaquetes()
+	partida := make(chan jogada)
 
-	go func() {
-		go iniciaPP(comm2)
-		go jogadorPP(JOGADOR1, canal, comm2, comm1)
-		go jogadorPP(JOGADOR2, canal, comm1, comm2)
-	}()
+	go pingPong(player1, player2, partida)
 
-	go assisteJogo(canal)
+	go assistePartida(partida)
 
 	var quit string
 	fmt.Scanln(&quit)
 }
 
-func iniciaPP(bolaEnviada chan<- bool) { bolaEnviada <- true }
+func criaRaquetes() (raquete1, raquete2 chan bool) {
+	raquete1 = make(chan bool)
+	raquete2 = make(chan bool)
+	return
+}
 
-func jogadorPP(jogador string, transmite chan<- jogada, bolaRecebida <-chan bool, bolaEnviada chan<- bool) {
+func iniciaPP(enviadaPara chan<- bool) { enviadaPara <- true }
+
+func jogadorPP(jogador string, recebeDe <-chan bool, enviaPara chan<- bool, partida chan<- jogada) {
 	var turno int
 	var bola bool
 	var evento jogada
@@ -45,24 +46,30 @@ func jogadorPP(jogador string, transmite chan<- jogada, bolaRecebida <-chan bool
 		turno++
 		t = time.Duration(rand.Intn(TJOGADA)) * time.Millisecond
 		time.Sleep(t)
-		bola = <-bolaRecebida
+		bola = <-recebeDe
 		evento.jogador = jogador
 		evento.jogada = turno
 		evento.tempo = t
-		transmite <- evento
-		bolaEnviada <- bola
+		partida <- evento
+		enviaPara <- bola
 	}
 }
 
-func assisteJogo(canal chan jogada) {
-	for v := range canal {
-		if v.tempo > TMAX {
-			fmt.Printf("%v\t%v\t\tPERDEU na jogada %v: %v maior que %v\n", v.jogada, v.jogador, v.jogada, v.tempo, TMAX)
+func pingPong(p1, p2 chan bool, partida chan jogada) {
+	go iniciaPP(p2)
+	go jogadorPP(JOGADOR1, p2, p1, partida)
+	go jogadorPP(JOGADOR2, p1, p2, partida)
+}
+
+func assistePartida(partida chan jogada) {
+	for evento := range partida {
+		if evento.tempo > TMAX {
+			fmt.Printf("%v\t%v\t\tPERDEU na jogada %v: %v maior que %v\n", evento.jogada, evento.jogador, evento.jogada, evento.tempo, TMAX)
 			fmt.Println()
 			fmt.Println("⌨\nDigite ENTER para encerrar o programa...")
 			return
 		} else {
-			fmt.Printf("%v\t%v\t\t%v\n", v.jogada, v.jogador, v.tempo)
+			fmt.Printf("%v\t%v\t\t%v\n", evento.jogada, evento.jogador, evento.tempo)
 		}
 	}
 }
