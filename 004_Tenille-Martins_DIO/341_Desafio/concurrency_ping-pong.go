@@ -6,19 +6,23 @@ import (
 	"time"
 )
 
-const JOGADOR1 string = "🏓 ping"
-const JOGADOR2 string = "pong 🏓"
+const JOGADOR1 nome = "🏓 ping"
+const JOGADOR2 nome = "pong 🏓"
 const TJOGADA int = 2000
 const TMAX time.Duration = 1900 * time.Millisecond
 
+type atleta bool
+
+type nome string
+
 type jogada struct {
 	jogada  int
-	jogador string
+	jogador nome
 	tempo   time.Duration
 }
 
 func main() {
-	player1, player2 := criaRaquetes()
+	player1, player2 := criaJogadores()
 	partida := make(chan jogada)
 
 	go pingPong(player1, player2, partida)
@@ -29,17 +33,17 @@ func main() {
 	fmt.Scanln(&quit)
 }
 
-func criaRaquetes() (raquete1, raquete2 chan bool) {
-	raquete1 = make(chan bool)
-	raquete2 = make(chan bool)
+func criaJogadores() (player1, player2 chan atleta) {
+	player1 = make(chan atleta)
+	player2 = make(chan atleta)
 	return
 }
 
-func iniciaPP(enviadaPara chan<- bool) { enviadaPara <- true }
+func iniciaPP(enviadaPara chan<- atleta) { enviadaPara <- true }
 
-func jogadorPP(jogador string, recebeDe <-chan bool, enviaPara chan<- bool, partida chan<- jogada) {
+func jogadorPP(jogador nome, recebeDe <-chan atleta, enviaPara chan<- atleta, partida chan<- jogada) {
 	var turno int
-	var bola bool
+	var bola atleta
 	var evento jogada
 	var t time.Duration
 	for {
@@ -55,7 +59,7 @@ func jogadorPP(jogador string, recebeDe <-chan bool, enviaPara chan<- bool, part
 	}
 }
 
-func pingPong(p1, p2 chan bool, partida chan jogada) {
+func pingPong(p1, p2 chan atleta, partida chan jogada) {
 	go iniciaPP(p2)
 	go jogadorPP(JOGADOR1, p2, p1, partida)
 	go jogadorPP(JOGADOR2, p1, p2, partida)
