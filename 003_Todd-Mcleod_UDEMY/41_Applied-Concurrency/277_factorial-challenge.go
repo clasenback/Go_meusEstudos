@@ -9,7 +9,7 @@ func main() {
 	nros := gen(100)
 	fac := fact(nros)
 	for v := range fac {
-		fmt.Println(v.fac, v.t)
+		fmt.Printf("%v\t%b\t%v\n", v.n, v.fac, v.t)
 	}
 }
 
@@ -32,6 +32,7 @@ func fact(in chan uint64) chan facto {
 			t := time.Now()
 			var res facto
 			res.fac = 1
+			res.n = n
 			for i := n; i > 0; i-- {
 				res.fac *= i
 			}
@@ -44,6 +45,7 @@ func fact(in chan uint64) chan facto {
 }
 
 type facto struct {
+	n   uint64
 	fac uint64
 	t   time.Duration
 }
