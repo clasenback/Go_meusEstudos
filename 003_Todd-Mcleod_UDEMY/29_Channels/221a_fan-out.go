@@ -48,7 +48,7 @@ func fanOutIn(c1, c2 chan pacote) {
 	for v := range c1 {
 		wg.Add(1)
 		go func(v2 pacote) {
-			c2 <- timeConsumingWork(v2)
+			c2 <- doShit(v2)
 			wg.Done()
 		}(v)
 	}
@@ -56,7 +56,7 @@ func fanOutIn(c1, c2 chan pacote) {
 	close(c2)
 }
 
-func timeConsumingWork(pct pacote) pacote {
+func doShit(pct pacote) pacote {
 	pct.tempo = time.Millisecond * time.Duration(rand.Intn(500))
 	//time.Sleep(pct.tempo)
 	time.Sleep(time.Millisecond)
