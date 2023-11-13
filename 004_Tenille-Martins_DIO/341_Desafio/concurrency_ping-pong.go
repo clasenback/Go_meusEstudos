@@ -11,14 +11,15 @@ const JOGADOR2 nome = "pong 🏓"
 const TJOGADA int = 2000
 const TMAX time.Duration = 1900 * time.Millisecond
 
-type atleta bool
+type atleta int
 
 type nome string
 
 type jogada struct {
-	jogada  int
-	jogador nome
-	tempo   time.Duration
+	jogada   int
+	jogador  nome
+	tempo    time.Duration
+	contador atleta
 }
 
 func main() {
@@ -39,7 +40,7 @@ func criaJogadores() (player1, player2 chan atleta) {
 	return
 }
 
-func iniciaPP(enviadaPara chan<- atleta) { enviadaPara <- true }
+func iniciaPP(enviadaPara chan<- atleta) { enviadaPara <- 0 }
 
 func jogadorPP(jogador nome, recebeDe <-chan atleta, enviaPara chan<- atleta, partida chan<- jogada) {
 	var turno int
@@ -51,6 +52,8 @@ func jogadorPP(jogador nome, recebeDe <-chan atleta, enviaPara chan<- atleta, pa
 		t = time.Duration(rand.Intn(TJOGADA)) * time.Millisecond
 		time.Sleep(t)
 		bola = <-recebeDe
+		bola++
+		evento.contador = bola
 		evento.jogador = jogador
 		evento.jogada = turno
 		evento.tempo = t
@@ -69,6 +72,7 @@ func assistePartida(partida chan jogada) {
 	for evento := range partida {
 		if evento.tempo > TMAX {
 			fmt.Printf("%v\t%v\t\tPERDEU na jogada %v: %v maior que %v\n", evento.jogada, evento.jogador, evento.jogada, evento.tempo, TMAX)
+			fmt.Println("Contador:", evento.contador)
 			fmt.Println()
 			fmt.Println("⌨\nDigite ENTER para encerrar o programa...")
 			return

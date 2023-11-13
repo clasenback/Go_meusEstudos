@@ -12,21 +12,32 @@ func main() {
 	//Multiple functions reading from the same chanel until that chanel is closed
 	//Distribute work across multiple functions (10 goroutines) that all read from in.
 	xc := fanOut(in, 10)
-
+	fmt.Println("Tamanho de xc:", len(xc))
 	//FAN IN
 	// multiplex multiple channels onto a single channel
 	// merge the channels from c0 through c9 onto a single channel
-	for n := range merge(xc...) {
-		fmt.Println(n)
+	for pacote := range merge(xc...) {
+		fmt.Printf("i: %v\tj: %v\tfan: %v\tfatorial: %v\n", pacote.i, pacote.j, pacote.fan, pacote.fatorial)
 	}
 }
 
-func gen() <-chan int {
-	out := make(chan int)
+type dados struct {
+	i        int
+	j        int
+	fatorial int
+	fan      int
+}
+
+// OK, sem bug
+func gen() <-chan dados {
+	out := make(chan dados)
 	go func() {
-		for i := 0; i < 10; i++ {
-			for j := 3; j < 13; j++ {
-				out <- j
+		for i := 0; i < 3; i++ {
+			for j := 3; j < 8; j++ {
+				var pct dados
+				pct.i = i
+				pct.j = j
+				out <- pct
 			}
 		}
 		close(out)
@@ -34,19 +45,13 @@ func gen() <-chan int {
 	return out
 }
 
-func fanOut(in <-chan int, n int) []<-chan int {
-	xc := make([]<-chan int, n)
-	for i := 0; i < n; i++ {
-		xc = append(xc, factorial(in))
-	}
-	return xc
-}
-
-func factorial(in <-chan int) <-chan int {
-	out := make(chan int)
+func factorial(in <-chan dados, fan int) <-chan dados {
+	out := make(chan dados)
 	go func() {
-		for n := range in {
-			out <- fact(n)
+		for pkg := range in {
+			pkg.fatorial = fact(pkg.j)
+			pkg.fan = fan
+			out <- pkg
 		}
 		close(out) //erro aqui
 	}()
@@ -61,10 +66,20 @@ func fact(n int) int {
 	return total
 }
 
-func merge(cs ...<-chan int) <-chan int {
+func fanOut(in <-chan dados, n int) []<-chan dados {
+	xc := make([]<-chan dados, 0)
+	for i := 0; i < n; i++ {
+		xc = append(xc, factorial(in, i))
+	}
+	return xc
+}
+
+func merge(cs ...<-chan dados) <-chan dados {
 	var wg sync.WaitGroup
-	out := make(chan int)
-	output := func(c <-chan int) {
+	out := make(chan dados)
+
+	// função output
+	output := func(c <-chan dados) {
 		for n := range c {
 			out <- n
 		}
